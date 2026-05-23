@@ -1,0 +1,17 @@
+rules:
+  - id: suspicious-npm-lifecycle-hooks
+    languages: [json]
+    message: >
+      High-risk lifecycle hook '$HOOK' detected in $PATH. These run automatically
+      during npm install and are a common vector for supply chain attacks.
+      Review this script carefully before proceeding.
+    severity: WARNING
+    pattern: |
+      {"scripts": {..., "$HOOK": "$CMD", ...}}
+    metavariable-regex:
+      metavariable: $HOOK
+      regex: ^(pre|post)install$
+    metadata:
+      category: security
+      cwe: CWE-506
+      owasp: "A08:2021 - Software and Data Integrity Failures"

@@ -1,0 +1,36 @@
+name: SAST & Supply Chain Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+
+      # Basic usage — all defaults
+      - name: Run SAST Scanner
+        uses: rusowyler/sast-action@v1
+
+      # --- OR customised usage ---
+      # - name: Run SAST Scanner
+      #   uses: rusowyler/sast-action@v1
+      #   with:
+      #     semgrep-config: "p/owasp-top-ten"   # use an official ruleset
+      #     custom-rules-path: ".semgrep/"       # your own rules on top
+      #     fail-on-severity: "WARNING"          # stricter threshold
+      #     supply-chain-audit: "true"           # package.json audit
+      #     artifact-name: "sast-results"        # custom artifact name
+
+      # Access outputs from the action in later steps
+      # - name: Report
+      #   run: |
+      #     echo "Semgrep findings : ${{ steps.scan.outputs.findings-count }}"
+      #     echo "Blocking findings: ${{ steps.scan.outputs.blocking-count }}"
+      #     echo "Supply chain hits: ${{ steps.scan.outputs.supply-chain-findings }}"
