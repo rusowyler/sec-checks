@@ -1,0 +1,21 @@
+name: Self-Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  sec-checks:
+    name: SAST & Supply Chain Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run SEC Checks
+        uses: ./
+        with:
+          trusted-actions: "actions/checkout, amannn/action-semantic-pull-request"
