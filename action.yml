@@ -53,8 +53,8 @@ runs:
         if [ -d "${{ inputs.custom-rules-path }}" ]; then
           CONFIGS="$CONFIGS --config=${{ inputs.custom-rules-path }}"
         fi
-        if [ -d "custom-rules/semgrep" ]; then
-          CONFIGS="$CONFIGS --config=custom-rules/semgrep"
+        if [ -d "$GITHUB_ACTION_PATH/custom-rules/semgrep" ]; then
+          CONFIGS="$CONFIGS --config=$GITHUB_ACTION_PATH/custom-rules/semgrep"
         fi
         semgrep scan $CONFIGS --json --output=semgrep-results.json
       continue-on-error: true
