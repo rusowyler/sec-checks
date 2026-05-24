@@ -10,7 +10,7 @@ rules:
     pattern-regex: 'uses:\s+[a-zA-Z0-9._/-]+@(latest|main|master|v\d+(\.\d+)*)\b'
     paths:
       include:
-        - .github/workflows/
+        - '**/.github/workflows/'
     metadata:
       category: security
       cwe: CWE-426
@@ -28,7 +28,7 @@ rules:
     pattern-regex: '(curl|wget)\s+[^\n|]*\|\s*(bash|sh|zsh)'
     paths:
       include:
-        - .github/workflows/
+        - '**/.github/workflows/'
     metadata:
       category: security
       cwe: CWE-494
