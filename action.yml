@@ -70,10 +70,13 @@ runs:
 
     - name: Run Semgrep
       shell: bash
+      env:
+        SEMGREP_CONFIG: ${{ inputs.semgrep-config }}
+        CUSTOM_RULES_PATH: ${{ inputs.custom-rules-path }}
       run: |
-        CONFIGS="--config=${{ inputs.semgrep-config }}"
-        if [ -d "${{ inputs.custom-rules-path }}" ]; then
-          CONFIGS="$CONFIGS --config=${{ inputs.custom-rules-path }}"
+        CONFIGS="--config=$SEMGREP_CONFIG"
+        if [ -d "$CUSTOM_RULES_PATH" ]; then
+          CONFIGS="$CONFIGS --config=$CUSTOM_RULES_PATH"
         fi
         CUSTOM_RULES="$GITHUB_ACTION_PATH/custom-rules/semgrep"
         if [ -d "$CUSTOM_RULES" ]; then
@@ -140,11 +143,13 @@ runs:
     - name: Count findings
       id: count
       shell: python3 {0}
+      env:
+        FAIL_ON_SEVERITY: ${{ inputs.fail-on-severity }}
       run: |
         import json, os
 
         severity_order = {"ERROR": 3, "WARNING": 2, "INFO": 1}
-        fail_on = "${{ inputs.fail-on-severity }}".upper()
+        fail_on = os.environ["FAIL_ON_SEVERITY"].upper()
         fail_level = severity_order.get(fail_on, 3)
 
         with open("semgrep-results.json") as f:
@@ -162,9 +167,12 @@ runs:
 
     - name: Fail if blocking findings exist
       shell: bash
+      env:
+        BLOCKING: ${{ steps.count.outputs.blocking }}
+        FAIL_ON_SEVERITY: ${{ inputs.fail-on-severity }}
       run: |
-        if [ "${{ steps.count.outputs.blocking }}" -gt "0" ]; then
-          echo "❌ ${{ steps.count.outputs.blocking }} blocking finding(s) at severity '${{ inputs.fail-on-severity }}' or above."
+        if [ "$BLOCKING" -gt "0" ]; then
+          echo "❌ $BLOCKING blocking finding(s) at severity '$FAIL_ON_SEVERITY' or above."
           exit 1
         fi
 
