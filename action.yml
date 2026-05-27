@@ -120,7 +120,7 @@ runs:
         counts = {"ERROR": 0, "WARNING": 0, "INFO": 0}
 
         with open(summary, "a") as out:
-            out.write("## 🔍 Semgrep SAST Results\n\n")
+            out.write("## Semgrep SAST Results\n\n")
 
             if not results:
                 out.write("✅ **No findings — clean scan!**\n")
@@ -242,7 +242,7 @@ runs:
 
         if summary:
             with open(summary, "a") as out:
-                out.write("## 🔐 Supply Chain Audit\n\n")
+                out.write("## Supply Chain Audit\n\n")
                 if not findings:
                     out.write("✅ **No suspicious lifecycle scripts detected.**\n")
                 else:
@@ -291,8 +291,8 @@ runs:
         table  = "## Results\n\n"
         table += "| | 🔴 Error | 🟡 Warning | 🔵 Info | Total |\n"
         table += "|---|:---:|:---:|:---:|:---:|\n"
-        table += f"| 🔍 Semgrep SAST Results | {sast_e} | {sast_w} | {sast_i} | {sast_t} |\n"
-        table += f"| 🔐 Supply Chain Audit | {sc} | 0 | 0 | {sc} |\n"
+        table += f"| Semgrep SAST Results | {sast_e} | {sast_w} | {sast_i} | {sast_t} |\n"
+        table += f"| Supply Chain Audit | {sc} | 0 | 0 | {sc} |\n"
         table += f"| **Total** | **{tot_e}** | **{tot_w}** | **{tot_i}** | **{tot_t}** |\n"
         table += "\n---\n\n"
 
@@ -309,7 +309,16 @@ runs:
 
     - name: Upload results artifact
       if: always()
+      id: artifact-upload
+      continue-on-error: true
       uses: actions/upload-artifact@v7
       with:
         name: ${{ inputs.artifact-name }}
         path: semgrep-results.json
+
+    - name: Warn on artifact upload failure
+      if: always() && steps.artifact-upload.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "⚠️ Artifact upload skipped — storage quota may be full. Results were not saved." \
+          >> "$GITHUB_STEP_SUMMARY"
