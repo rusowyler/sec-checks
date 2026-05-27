@@ -31,6 +31,10 @@ inputs:
     description: "Comma-separated action names allowed to use version tags instead of commit SHAs (e.g. actions/checkout, docker/login-action)"
     required: false
     default: ""
+  pr-diff-mode:
+    description: "Use 'semgrep ci' (diff-aware) on pull requests and 'semgrep scan' on full runs. Set to 'false' to always use semgrep scan."
+    required: false
+    default: "true"
 
 outputs:
   findings-count:
@@ -73,6 +77,7 @@ runs:
       env:
         SEMGREP_CONFIG: ${{ inputs.semgrep-config }}
         CUSTOM_RULES_PATH: ${{ inputs.custom-rules-path }}
+        PR_DIFF_MODE: ${{ inputs.pr-diff-mode }}
       run: |
         CONFIGS="--config=$SEMGREP_CONFIG"
         if [ -d "$CUSTOM_RULES_PATH" ]; then
@@ -92,7 +97,11 @@ runs:
             CONFIGS="$CONFIGS --config=$CUSTOM_RULES"
           fi
         fi
-        semgrep scan $CONFIGS --json --output=semgrep-results.json
+        if [ "$PR_DIFF_MODE" = "true" ] && [ -n "$GITHUB_BASE_REF" ]; then
+          semgrep ci $CONFIGS --json --output=semgrep-results.json
+        else
+          semgrep scan $CONFIGS --json --output=semgrep-results.json
+        fi
       continue-on-error: true
 
     - name: Generate Semgrep Summary
