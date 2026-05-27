@@ -35,13 +35,13 @@ A composite GitHub Action that runs [Semgrep](https://semgrep.dev) SAST scanning
 
 > **`trusted-actions`** — By default the action warns on any `uses: owner/action@vX` reference because mutable tags are a supply chain risk (see [tj-actions/changed-files, March 2025](https://www.infoq.com/news/2025/04/compromised-github-action/)). Add well-maintained, frequently-audited actions here to suppress those warnings while still catching less established ones.
 >
-> **Reusable workflow calls** (e.g. `uses: Lendistrydev/sot/.github/workflows/deployer-dev.yaml@main`) are also matched. Pass either:
-> - The `owner/repo` prefix to trust the entire repository: `Lendistrydev/sot`
-> - The full workflow path to trust only that specific file: `Lendistrydev/sot/.github/workflows/deployer-dev.yaml`
+> **Reusable workflow calls** (e.g. `uses: Example/sot/.github/workflows/deployer.yaml@main`) are also matched. Pass either:
+> - The `owner/repo` prefix to trust the entire repository: `Example/sot`
+> - The full workflow path to trust only that specific file: `Example/sot/.github/workflows/deployer.yaml`
 >
 > Example trusting both standard actions and a reusable workflow repo:
 > ```yaml
-> trusted-actions: "actions/checkout, actions/setup-node, Lendistrydev/sot"
+> trusted-actions: "actions/checkout, actions/setup-node, Example/sot"
 > ```
 
 ## Inputs
