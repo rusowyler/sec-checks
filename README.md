@@ -34,6 +34,15 @@ A composite GitHub Action that runs [Semgrep](https://semgrep.dev) SAST scanning
 ```
 
 > **`trusted-actions`** — By default the action warns on any `uses: owner/action@vX` reference because mutable tags are a supply chain risk (see [tj-actions/changed-files, March 2025](https://www.infoq.com/news/2025/04/compromised-github-action/)). Add well-maintained, frequently-audited actions here to suppress those warnings while still catching less established ones.
+>
+> **Reusable workflow calls** (e.g. `uses: Lendistrydev/sot/.github/workflows/deployer-dev.yaml@main`) are also matched. Pass either:
+> - The `owner/repo` prefix to trust the entire repository: `Lendistrydev/sot`
+> - The full workflow path to trust only that specific file: `Lendistrydev/sot/.github/workflows/deployer-dev.yaml`
+>
+> Example trusting both standard actions and a reusable workflow repo:
+> ```yaml
+> trusted-actions: "actions/checkout, actions/setup-node, Lendistrydev/sot"
+> ```
 
 ## Inputs
 
@@ -70,7 +79,15 @@ tests/fixtures/
 
 Semgrep reads this file automatically — no action input change required. Excluded paths are skipped entirely, so no findings will be reported for them.
 
-> **Tip:** To suppress a single rule inline rather than an entire path, add a `# nosemgrep: rule-id` comment on the offending line in your source file.
+### Inline suppression
+
+To suppress a single finding without changing `trusted-actions` or ignoring an entire path, add `# nosemgrep: github-actions-unpinned-action` to the end of the `uses:` line in your workflow file:
+
+```yaml
+uses: repo-owner/repo-name/.github/workflows/deployer.yaml@main  # nosemgrep: github-actions-unpinned-action
+```
+
+Use this for one-off exemptions; prefer `trusted-actions` when you want to trust all workflows from an internal repo.
 
 ## Detected supply chain patterns
 

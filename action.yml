@@ -63,7 +63,7 @@ runs:
       run: |
         import yaml, re, os
         trusted = [p.strip() for p in os.environ['TRUSTED'].split(',') if p.strip()]
-        excl = r'uses:\s+(' + '|'.join(re.escape(p) for p in trusted) + r')@'
+        excl = r'uses:\s+(' + '|'.join(re.escape(p) for p in trusted) + r')[/@]'
         with open(os.environ['CI_SEC_SRC']) as f:
             doc = yaml.safe_load(f)
         for r in doc.get('rules', []):
