@@ -63,12 +63,13 @@ runs:
       run: |
         import yaml, re, os
         trusted = [p.strip() for p in os.environ['TRUSTED'].split(',') if p.strip()]
-        excl = r'(?i)uses:\s+(' + '|'.join(re.escape(p) for p in trusted) + r')[/@]'
+        excl_alts = '|'.join(re.escape(p) for p in trusted)
+        new_pattern = r'uses:\s+(?!(?i:' + excl_alts + r')[/@])[a-zA-Z0-9._/-]+@(latest|main|master|v\d+(\.\d+)*)\b'
         with open(os.environ['CI_SEC_SRC']) as f:
             doc = yaml.safe_load(f)
         for r in doc.get('rules', []):
             if r.get('id') == 'github-actions-unpinned-action' and 'pattern-regex' in r:
-                r['patterns'] = [{'pattern-regex': r.pop('pattern-regex')}, {'pattern-not-regex': excl}]
+                r['pattern-regex'] = new_pattern
         with open('/tmp/ci-security-modified.yml', 'w') as f:
             yaml.dump(doc, f, default_flow_style=False)
 
